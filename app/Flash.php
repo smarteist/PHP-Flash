@@ -112,12 +112,12 @@ class Flash
 
     /**
      * @param $url string
-     * @param int $delayInSec
+     * @param int $delaysInSec
      * @return $this
      */
-    public function setSecondRedirect($url, $delayInSec = 5)
+    public function redirectAfter($delaysInSec, $url)
     {
-        @header("Refresh: {$delayInSec}; URL={$url}", true, $this->statusCode);
+        @header("Refresh: {$delaysInSec}; URL={$url}", true, $this->statusCode);
         return $this;
     }
 
