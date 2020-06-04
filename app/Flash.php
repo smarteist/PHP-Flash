@@ -21,7 +21,7 @@ class Flash
     /**
      * @var int
      */
-    private $statusCode = 302;
+    private $statusCode = 301;
     /**
      * @var string
      */
@@ -70,7 +70,7 @@ class Flash
      *
      * @return Flash
      */
-    public function withStatus($status = 302)
+    public function withStatus($status = 301)
     {
         $this->statusCode = $status;
         return $this;
@@ -115,9 +115,9 @@ class Flash
      * @param int $delaysInSec
      * @return $this
      */
-    public function redirectAfter($delaysInSec, $url)
+    public function secondRedirect($delaysInSec, $url)
     {
-        @header("Refresh: {$delaysInSec}; URL={$url}", true, $this->statusCode);
+        self::$sessionHandler->setFlashHeader("Refresh: {$delaysInSec}; URL={$url}");
         return $this;
     }
 

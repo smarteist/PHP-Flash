@@ -12,6 +12,11 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
     const FLASH_KEYS = 'flash_keys_f3740dce19e03367d9';
 
     /**
+     * Unique id for flash headers.
+     */
+    const FLASH_HEADER = 'flash_header_f3740dce19e03367d9';
+
+    /**
      * @var bool determines session cleanup should skipped or not
      */
     private $skipCleanup;
@@ -34,6 +39,10 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             @session_start();
+        }
+        if (isset($_SESSION[self::FLASH_HEADER])) {
+            @header($_SESSION[self::FLASH_HEADER]);
+            unset($_SESSION[self::FLASH_HEADER]);
         }
         // linked field to sessions as a pointer
         $this->messageKeys =& $_SESSION[self::FLASH_KEYS];
@@ -71,6 +80,11 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
     {
         $_SESSION[$key] = $value;
         $this->messageKeys[] = $key;
+    }
+
+    function setFlashHeader($header)
+    {
+        $_SESSION[self::FLASH_HEADER] = $header;
     }
 
     function getMessage($key)
