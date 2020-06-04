@@ -54,12 +54,12 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
         register_shutdown_function([$this, 'sessionCleanup']);
     }
 
-    function getSkipCleanup(): bool
+    function getSkipCleanup()
     {
         return $this->skipCleanup;
     }
 
-    function setSkipCleanup(bool $skip)
+    function setSkipCleanup($skip)
     {
         $this->skipCleanup = $skip;
     }
