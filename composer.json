@@ -1,0 +1,36 @@
+{
+  "name": "hexbit/php-flash",
+  "description": "Its a session based redirector with flash messages for php.",
+  "keywords": [
+    "hexbit",
+    "smarteist",
+    "wordpress",
+    "redirect",
+    "session",
+    "flash",
+    "message"
+  ],
+  "homepage": "https://github.com/smarteist/wordpress-router",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ali",
+      "email": "ali.hosseini.sr@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Hexbit\\Flash\\": "app"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests"
+    }
+  },
+  "require": {},
+  "require-dev": {
+    "phpunit/phpunit": "^9.1"
+  }
+}
