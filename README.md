@@ -29,7 +29,7 @@ $flash->redirectBy('contact')
 
 // redirect to specific location
 $flash->redirectBy('contact')
-        ->redirectLocation("https://somwhere/")
+        ->redirectLocation("https://somewhere/")
         ->withStatus(302)
         ->message('failed', 'It seems your email is not valid!')
         ->redirect();
@@ -37,7 +37,7 @@ $flash->redirectBy('contact')
 // redirect to specific location and then redirect again after 5 seconds!
 $flash->redirectLocation("https://somwhere/")
         ->message('failed', 'It seems your email is not valid!')
-        ->setSecondRedirect("https://somwhereelse/", 5)
+        ->secondRedirect(5, "https://somewhereelse/")
         ->redirect();
 
 
