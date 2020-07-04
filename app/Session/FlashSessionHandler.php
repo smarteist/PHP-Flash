@@ -19,7 +19,7 @@ class FlashSessionHandler extends Script implements SessionHandler
     /**
      * @var bool determines session cleanup should skipped or not
      */
-    private $skipCleanup = false;
+    private $skipCleanup;
 
     /**
      * @var array $messageKeys for cleanup job on shutdown function
@@ -45,12 +45,13 @@ class FlashSessionHandler extends Script implements SessionHandler
         $this->messageKeys =& $_SESSION[self::FLASH_KEYS];
         $this->flashHeaders =& $_SESSION[self::FLASH_HEADER];
 
-        if (isset($this->flashHeaders) && is_array($this->flashHeaders)) {
+        if (isset($this->flashHeaders)) {
             foreach ($this->flashHeaders as $header) {
                 @header($header);
             }
-            $this->flashHeaders = null;
         }
+        // clear flash headers
+        $this->flashHeaders = [];
 
         if (!isset($this->messageKeys)) {
             $this->messageKeys = [];
@@ -106,11 +107,14 @@ class FlashSessionHandler extends Script implements SessionHandler
 
     /**
      * @param $key
-     * @return mixed
+     * @return string|null flash data if exists.
      */
     function getSessionData($key)
     {
-        return $_SESSION[$key];
+        if (in_array($key, $this->getFlashKeys())) {
+            return $_SESSION[$key];
+        }
+        return null;
     }
 
     /**
@@ -119,6 +123,7 @@ class FlashSessionHandler extends Script implements SessionHandler
      */
     function removeSessionData($key)
     {
+        unset($_SESSION[$key]);
         unset($this->messageKeys[array_search($key, $this->messageKeys)]);
         if (empty($this->messageKeys)) {
             $this->skipCleanup = false;
