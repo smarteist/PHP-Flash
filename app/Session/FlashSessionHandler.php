@@ -4,7 +4,7 @@
 namespace Hexbit\Flash\Session;
 
 
-class FlashSessionHandler implements SessionCleaner, SessionHandler
+class FlashSessionHandler extends Script implements SessionHandler
 {
     /**
      * Unique id for flash keys.
@@ -19,7 +19,7 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
     /**
      * @var bool determines session cleanup should skipped or not
      */
-    private $skipCleanup;
+    private $skipCleanup = false;
 
     /**
      * @var array $messageKeys for cleanup job on shutdown function
@@ -27,43 +27,125 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
      */
     private $messageKeys;
 
+    /**
+     * @var array of flash headers who will be stored in session storage
+     * @linked to $_SESSION super global array
+     */
+    private $flashHeaders;
+
     public function __construct()
     {
-        $this->init();
-    }
+        parent::init();
 
-    /**
-     * Initialization jobs for this handler
-     */
-    function init()
-    {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             @session_start();
         }
-        if (isset($_SESSION[self::FLASH_HEADER])) {
-            @header($_SESSION[self::FLASH_HEADER]);
-            unset($_SESSION[self::FLASH_HEADER]);
-        }
-        // linked field to sessions as a pointer
+
+        // linked sessions to fields as a pointer
         $this->messageKeys =& $_SESSION[self::FLASH_KEYS];
+        $this->flashHeaders =& $_SESSION[self::FLASH_HEADER];
+
+        if (isset($this->flashHeaders) && is_array($this->flashHeaders)) {
+            foreach ($this->flashHeaders as $header) {
+                @header($header);
+            }
+            $this->flashHeaders = null;
+        }
+
         if (!isset($this->messageKeys)) {
             $this->messageKeys = [];
         }
+
         $this->skipCleanup = false;
-        // cleanup session when script reached to the endpoint.
-        register_shutdown_function([$this, 'sessionCleanup']);
     }
 
+    /**
+     * @return bool indicates that script skips current session data
+     * cleaning or not.
+     */
     function getSkipCleanup()
     {
         return $this->skipCleanup;
     }
 
+    /**
+     * @param $skip bool changes session data cleaning indicator.
+     */
     function setSkipCleanup($skip)
     {
         $this->skipCleanup = $skip;
     }
 
+    /**
+     * @param $header string add a flash http header for next script running.
+     */
+    function setFlashHeader($header)
+    {
+        $this->flashHeaders[] = $header;
+    }
+
+    /**
+     * removes http flash header by key.
+     * @param $key
+     */
+    function removeFlashHeader($key)
+    {
+        unset($this->flashHeaders[array_search($key, $this->flashHeaders)]);
+    }
+
+    /**
+     * adds a new flash message in sessions.
+     * @param $key
+     * @param $value
+     */
+    function setSessionData($key, $value)
+    {
+        $_SESSION[$key] = $value;
+        $this->messageKeys[] = $key;
+    }
+
+    /**
+     * @param $key
+     * @return mixed
+     */
+    function getSessionData($key)
+    {
+        return $_SESSION[$key];
+    }
+
+    /**
+     * removes data from flash sessions by key.
+     * @param $key
+     */
+    function removeSessionData($key)
+    {
+        unset($this->messageKeys[array_search($key, $this->messageKeys)]);
+        if (empty($this->messageKeys)) {
+            $this->skipCleanup = false;
+        }
+    }
+
+    /**
+     * @return array of current flash message keys.
+     */
+    function getFlashKeys()
+    {
+        return $this->messageKeys;
+    }
+
+    /**
+     * script end point.
+     */
+    public function teardown()
+    {
+        $this->sessionCleanup();
+    }
+
+    /**
+     * This method clears the session on script endpoint
+     * when script reached on shut down function , it means all messages
+     * added to the output on that point, and we can cleanup the flashes.
+     */
     function sessionCleanup()
     {
         if (!self::getSkipCleanup()) {
@@ -74,34 +156,5 @@ class FlashSessionHandler implements SessionCleaner, SessionHandler
             //clean stored keys itself
             $this->messageKeys = [];
         }
-    }
-
-    function setMessage($key, $value)
-    {
-        $_SESSION[$key] = $value;
-        $this->messageKeys[] = $key;
-    }
-
-    function setFlashHeader($header)
-    {
-        $_SESSION[self::FLASH_HEADER] = $header;
-    }
-
-    function getMessage($key)
-    {
-        return $_SESSION[$key];
-    }
-
-    function removeMessage($key)
-    {
-        unset($this->messageKeys[array_search($key, $this->messageKeys)]);
-        if (empty($this->messageKeys)) {
-            $this->skipCleanup = false;
-        }
-    }
-
-    function getFlashKeys()
-    {
-        return $this->messageKeys;
     }
 }

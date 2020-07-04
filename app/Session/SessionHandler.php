@@ -6,9 +6,13 @@ namespace Hexbit\Flash\Session;
 
 interface SessionHandler
 {
-    function setMessage($key, $value);
+    function getFlashKeys();
 
-    function getMessage($key);
+    function sessionCleanup();
 
-    function removeMessage($key);
+    function setSessionData($key, $value);
+
+    function getSessionData($key);
+
+    function removeSessionData($key);
 }

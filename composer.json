@@ -10,7 +10,7 @@
     "flash",
     "message"
   ],
-  "homepage": "https://github.com/smarteist/wordpress-router",
+  "homepage": "https://github.com/smarteist/PHP-Flash",
   "type": "library",
   "license": "MIT",
   "authors": [

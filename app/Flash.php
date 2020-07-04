@@ -50,7 +50,7 @@ class Flash
         if (!isset(self::$sessionHandler)) {
             throw new FlashHandlerNotInitialized();
         }
-        self::$sessionHandler->setMessage($key, $message);
+        self::$sessionHandler->setSessionData($key, $message);
         return $this;
     }
 
